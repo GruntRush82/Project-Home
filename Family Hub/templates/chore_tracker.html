@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Project Home - Chore Tracker</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Chore Tracker</h1>
+
+        <!-- Create User Form -->
+        <section>
+            <h2>Create User</h2>
+            <form id="create-user-form">
+                <input type="text" id="username-input" placeholder="Enter a username" required>
+                <button type="submit">Create User</button>
+            </form>
+        </section>
+
+        <!-- Add Chore Form -->
+        <section>
+            <h2>Add a Chore</h2>
+            <form id="add-chore-form">
+                <input type="text" id="chore-input" placeholder="Enter a new chore" required>
+
+                <select id="user-select" required>
+                    <option value="" disabled selected>Select User</option>
+                </select>
+
+                <select id="day-select" required>
+                    <option value="" disabled selected>Select Day</option>
+                    <option>Monday</option>
+                    <option>Tuesday</option>
+                    <option>Wednesday</option>
+                    <option>Thursday</option>
+                    <option>Friday</option>
+                    <option>Saturday</option>
+                    <option>Sunday</option>
+                </select>
+
+                <select id="rotation-select" required>
+                    <option value="" disabled selected>Rotation Type</option>
+                    <option value="static">Static</option>
+                    <option value="rotating">Rotating</option>
+                </select>
+
+                <button type="submit">Add Chore</button>
+            </form>
+        </section>
+
+        <!-- Chore Grid Container -->
+        <section>
+            <h2>Weekly Chore Grid</h2>
+            <div id="chore-list">
+                <!-- JavaScript will dynamically insert each user's row here -->
+            </div>
+        </section>
+    </div>
+
+    <script src="{{ url_for('static', filename='scripts.js') }}"></script>
+</body>
+</html>

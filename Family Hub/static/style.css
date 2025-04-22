@@ -1,0 +1,102 @@
+/* Base Page Styling */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 20px;
+    background-color: #f7f7f7;
+}
+
+.container {
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+/* Forms */
+form {
+    margin-bottom: 20px;
+}
+
+input, select, button {
+    padding: 6px 10px;
+    margin: 5px;
+    font-size: 14px;
+}
+
+/* Chore Grid Section */
+#chore-list {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+/* One full grid per user */
+.user-section {
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    background-color: #fff;
+    padding: 10px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+/* Header with username and delete */
+.user-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.user-name {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+/* Days of the week header row */
+.days-header {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    font-weight: bold;
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 4px;
+    text-align: center;
+}
+
+/* Row with each day’s chores */
+.user-row {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 10px;
+    margin-top: 10px;
+}
+
+/* One column for a day */
+.day-col {
+    min-height: 80px;
+    border-left: 1px solid #eee;
+    padding: 4px;
+}
+
+/* Chore card styling */
+.chore-item {
+    background-color: #f9f9f9;
+    padding: 6px;
+    margin-bottom: 6px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.chore-title {
+    font-weight: bold;
+}
+
+.chore-status, .chore-rotation {
+    font-size: 13px;
+    margin: 2px 0;
+}
+
+.chore-item button {
+    font-size: 12px;
+    margin-right: 4px;
+    margin-top: 5px;
+}

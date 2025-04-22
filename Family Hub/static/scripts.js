@@ -1,0 +1,166 @@
+document.addEventListener("DOMContentLoaded", function () {
+    const choreList = document.getElementById("chore-list");
+
+    // Populate the user dropdown
+    fetch("/users")
+        .then(response => response.json())
+        .then(users => {
+            const userSelect = document.getElementById('user-select');
+            users.forEach(user => {
+                const option = document.createElement("option");
+                option.value = user.id;
+                option.textContent = user.username;
+                userSelect.appendChild(option);
+            });
+        });
+
+    // Handle creating a new user
+    document.getElementById('create-user-form').addEventListener('submit', function (e) {
+        e.preventDefault();
+        const username = document.getElementById('username-input').value;
+
+        fetch("/users", {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username: username })
+        })
+        .then(res => res.json())
+        .then(user => {
+            const userSelect = document.getElementById('user-select');
+            const option = document.createElement("option");
+            option.value = user.id;
+            option.textContent = user.username;
+            userSelect.appendChild(option);
+        });
+    });
+
+    // Handle adding a new chore
+    document.getElementById('add-chore-form').addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        const description = document.getElementById('chore-input').value;
+        const userId = document.getElementById('user-select').value;
+        const day = document.getElementById('day-select').value;
+        const rotation = document.getElementById('rotation-select').value;
+
+        fetch("/chores", {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                description: description,
+                user_id: userId,
+                day: day,
+                rotation_type: rotation
+            })
+        })
+        .then(() => loadChores());
+    });
+
+    // Fetch all chores and render them grouped by user
+    function loadChores() {
+        fetch("/chores")
+            .then(res => res.json())
+            .then(chores => {
+                const grouped = groupChoresByUser(chores);
+                const usersWithChores = Object.entries(grouped).map(([userId, userChores]) => ({
+                    id: userId,
+                    name: userChores[0]?.username || "Unknown",
+                    chores: userChores.map(chore => ({
+                        id: chore.id,
+                        description: chore.description,
+                        day: chore.day,
+                        status: chore.completed ? "Completed" : "Incomplete",
+                        rotation: chore.rotation_type
+                    }))
+                }));
+                renderUserChores(usersWithChores);
+            });
+    }
+
+    function groupChoresByUser(chores) {
+        return chores.reduce((acc, chore) => {
+            if (!acc[chore.user_id]) acc[chore.user_id] = [];
+            acc[chore.user_id].push(chore);
+            return acc;
+        }, {});
+    }
+
+    function renderUserChores(users) {
+        choreList.innerHTML = "";
+        const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+
+        users.forEach(user => {
+            const section = document.createElement("div");
+            section.className = "user-section";
+
+            const header = document.createElement("div");
+            header.className = "user-header";
+            header.innerHTML = `<span class="user-name">${user.name}</span><button class="delete-user" data-user-id="${user.id}">Delete User</button>`;
+
+            const daysHeader = document.createElement("div");
+            daysHeader.className = "days-header";
+            days.forEach(day => {
+                const dayDiv = document.createElement("div");
+                dayDiv.textContent = day;
+                daysHeader.appendChild(dayDiv);
+            });
+
+            const userRow = document.createElement("div");
+            userRow.className = "user-row";
+            days.forEach(day => {
+                const col = document.createElement("div");
+                col.className = "day-col";
+                user.chores.filter(chore => chore.day === day).forEach(chore => {
+                    const choreCard = document.createElement("div");
+                    choreCard.className = "chore-item";
+                    choreCard.setAttribute("data-id", chore.id);
+                    choreCard.innerHTML = `
+                        <div class="chore-title">${chore.description}</div>
+                        <div class="chore-status">Status: ${chore.status}</div>
+                        <div class="chore-rotation">Rotation: ${chore.rotation}</div>
+                        <button onclick="deleteChore(${chore.id})">Delete</button>
+                        <button onclick="editChore(${chore.id})">Edit</button>
+                        <button onclick="toggleCompleted(${chore.id})">Toggle</button>
+                    `;
+                    col.appendChild(choreCard);
+                });
+                userRow.appendChild(col);
+            });
+
+            section.appendChild(header);
+            section.appendChild(daysHeader);
+            section.appendChild(userRow);
+            choreList.appendChild(section);
+        });
+    }
+
+    loadChores();
+});
+
+function deleteChore(id) {
+    fetch(`/chores/${id}`, { method: 'DELETE' })
+        .then(() => document.querySelector(`[data-id='${id}']`)?.remove());
+}
+
+function editChore(id) {
+    const newDesc = prompt("New description:");
+    if (newDesc) {
+        fetch(`/chores/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ description: newDesc })
+        }).then(() => location.reload());
+    }
+}
+
+function toggleCompleted(id) {
+    fetch(`/chores/${id}`)
+        .then(res => res.json())
+        .then(chore => {
+            fetch(`/chores/${id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ completed: !chore.completed })
+            }).then(() => location.reload());
+        });
+}
