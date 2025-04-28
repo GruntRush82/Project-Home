@@ -113,15 +113,22 @@ document.addEventListener("DOMContentLoaded", function () {
                 user.chores.filter(chore => chore.day === day).forEach(chore => {
                     const choreCard = document.createElement("div");
                     choreCard.className = "chore-item";
+                    if (chore.status === "Completed") {
+                        choreCard.classList.add("completed");
+                    }
+                    
                     choreCard.setAttribute("data-id", chore.id);
                     choreCard.innerHTML = `
                         <div class="chore-title">${chore.description}</div>
                         <div class="chore-status">Status: ${chore.status}</div>
                         <div class="chore-rotation">Rotation: ${chore.rotation}</div>
-                        <button onclick="deleteChore(${chore.id})">Delete</button>
-                        <button onclick="editChore(${chore.id})">Edit</button>
-                        <button onclick="toggleCompleted(${chore.id})">Done!</button>
+                        <div class="chore-buttons">
+                            <button class="delete-btn" onclick="deleteChore(${chore.id})">Delete</button>
+                            <button class="edit-btn" onclick="editChore(${chore.id})">Edit</button>
+                            <button class="primary-btn" onclick="toggleCompleted(${chore.id})">Done!</button>
+                        </div>
                     `;
+                
                     col.appendChild(choreCard);
                 });
                 userRow.appendChild(col);
@@ -161,6 +168,17 @@ function toggleCompleted(id) {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ completed: !chore.completed })
-            }).then(() => location.reload());
+            }).then(() => {
+                const card = document.querySelector(`[data-id='${id}']`);
+                if (card) {
+                    if (!chore.completed) {
+                        card.classList.add("completed");
+                        card.querySelector(".chore-status").innerText = "Status: Completed";
+                    } else {
+                        card.classList.remove("completed");
+                        card.querySelector(".chore-status").innerText = "Status: Incomplete";
+                    }
+                }
+            });
         });
 }
