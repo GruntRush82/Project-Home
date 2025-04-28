@@ -32,13 +32,17 @@ class Chore(db.Model):
 class ChoreHistory(db.Model):
     id = db.Column(db.Integer, primary_key = True)
     chore_id = db.Column(db.Integer, db.ForeignKey('chore.id'), nullable=False)
+    username = db.Column(db.String(100), nullable=False)
     date = db.Column(db.Date, nullable=False)
     completed = db.Column(db.Boolean, nullable=False)
+    day = db.Column(db.String(100), nullable=False)
+    rotation_type = db.Column(db.String(10), nullable=False)
+
     chore = db.relationship('Chore', backref='history')
 
 
-@scheduler.task('cron', id='daily_archive', hour=0, minute=0, misfire_grace_time=60, coalesce = True, max_instances= 1)
-def daily_archive_task():
+@scheduler.task('cron', id='weekly_archive',day_of_week='mon', hour=0, minute=0, misfire_grace_time=60, coalesce = True, max_instances= 1)
+def weekly_archive_task():
     with app.app_context():
         today = date.today()
         if ChoreHistory.query.filter_by(date=today).first():
@@ -50,8 +54,11 @@ def daily_archive_task():
             # Add a record to ChoreHistory
             chore_history = ChoreHistory(
                 chore_id=chore.id,
+                username=chore.user.username,
                 date=today,
-                completed=chore.completed
+                completed=chore.completed,
+                day=chore.day,
+                rotation_type=chore.rotation_type
             )
             db.session.add(chore_history)
             # Reset the chore's status to incomplete
@@ -185,8 +192,11 @@ def archive_chores():
         # Add a record to ChoreHistory
         chore_history = ChoreHistory(
             chore_id=chore.id,
+            username=chore.user.username,
             date=date.today(),
-            completed=chore.completed
+            completed=chore.completed,
+            day=chore.day,
+            rotation_type=chore.rotation_type
         )
         db.session.add(chore_history)
         # Reset the chore's status to incomplete
@@ -194,6 +204,23 @@ def archive_chores():
 
     db.session.commit()
     return jsonify({"message": "All chores archived and reset"}), 200
+
+@app.route('/archive', methods=['GET'])
+def get_archive():
+    history = ChoreHistory.query.all()
+    history_list = [
+        {
+            "id" : record.id,
+            "chore_id" : record.chore_id,
+            "username" : record.username,
+            "date" : record.date.strftime('%Y-%m-%d'),
+            "completed" : record.completed,
+            "day" : record.day,
+            "rotation_type" : record.rotation_type
+        }
+        for record in history
+    ]
+    return jsonify(history_list)
 
 @app.route('/chores/clear-archive', methods=['DELETE'])
 def clear_archive():

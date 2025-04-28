@@ -120,7 +120,7 @@ document.addEventListener("DOMContentLoaded", function () {
                         <div class="chore-rotation">Rotation: ${chore.rotation}</div>
                         <button onclick="deleteChore(${chore.id})">Delete</button>
                         <button onclick="editChore(${chore.id})">Edit</button>
-                        <button onclick="toggleCompleted(${chore.id})">Toggle</button>
+                        <button onclick="toggleCompleted(${chore.id})">Done!</button>
                     `;
                     col.appendChild(choreCard);
                 });
