@@ -123,9 +123,11 @@ document.addEventListener("DOMContentLoaded", function () {
                         <div class="chore-status">Status: ${chore.status}</div>
                         <div class="chore-rotation">Rotation: ${chore.rotation}</div>
                         <div class="chore-buttons">
-                            <button class="delete-btn" onclick="deleteChore(${chore.id})">Delete</button>
-                            <button class="edit-btn" onclick="editChore(${chore.id})">Edit</button>
-                            <button class="primary-btn" onclick="toggleCompleted(${chore.id})">Done!</button>
+                            <div class="top-row">
+                                <button class="delete-btn" onclick="deleteChore(${chore.id})">Delete</button>
+                                <button class="edit-btn" onclick="editChore(${chore.id})">Edit</button>
+                            </div>
+                            <button class="primary-btn" onclick="toggleCompleted(${chore.id})">${chore.status === "Completed" ? "Undo" : "Done!"}</button>
                         </div>
                     `;
                 
@@ -168,17 +170,30 @@ function toggleCompleted(id) {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ completed: !chore.completed })
-            }).then(() => {
+            }).then(res => res.json())
+              .then(updatedChore => {
                 const card = document.querySelector(`[data-id='${id}']`);
                 if (card) {
-                    if (!chore.completed) {
+                    const statusElement = card.querySelector(".chore-status");
+                    const buttonElement = card.querySelector(".primary-btn");
+
+                    if (updatedChore.completed) {
                         card.classList.add("completed");
-                        card.querySelector(".chore-status").innerText = "Status: Completed";
+                        statusElement.innerText = "Status: Completed";
+                        if (buttonElement) {
+                            buttonElement.innerText = "Undo";
+                            buttonElement.classList.add("undo-btn");
+                        }
                     } else {
                         card.classList.remove("completed");
-                        card.querySelector(".chore-status").innerText = "Status: Incomplete";
+                        statusElement.innerText = "Status: Incomplete";
+                        if (buttonElement) {
+                            buttonElement.innerText = "Done!";
+                            buttonElement.classList.remove("undo-btn");
+                        }
                     }
                 }
             });
         });
 }
+

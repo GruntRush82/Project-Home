@@ -7,7 +7,7 @@ body {
 }
 
 .container {
-    max-width: 2200px;
+    max-width: 1600px;
     margin: 0 auto;
 }
 
@@ -64,7 +64,7 @@ input, select, button {
 /* Row with each day’s chores */
 .user-row {
     display: grid;
-    grid-template-columns: repeat(7, minmax(300px, 1fr));
+    grid-template-columns: repeat(7, minmax(220px, 1fr));
     gap: 10px;
     margin-top: 10px;
 }
@@ -81,7 +81,7 @@ input, select, button {
 .chore-item {
     width: 100%;
     box-sizing: border-box;
-    padding: 10px;
+    padding: 8px;
 }
 
 
@@ -130,52 +130,60 @@ input, select, button {
 
 .chore-buttons {
     display: flex;
-    justify-content: space-between;
-    gap: 8px;
+    flex-direction: column; /* change from row to column */
+    gap: 4px;
     margin-top: 8px;
 }
 
 
 
+.chore-buttons .top-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 4px;
+}
 
-.chore-buttons button {
+.chore-buttons .top-row button {
     flex: 1;
-    min-width: 80px;
-    max-width: 100px;
-    padding: 8px;
-    font-size: 14px;
-    height: 44px;
-    border-radius: 6px;
+    padding: 4px 6px;
+    font-size: 12px;
+    height: 30px;
 }
 
-
-
-.chore-buttons button {
-    flex: 1; /* Each button shares equal width */
-    padding: 8px;
-    min-width: 60px;
-    max-width: 100px;
-    font-size: 14px;
-    height: 40px;
-    border-radius: 6px;
-    border: 1px solid #ccc;
-    background-color: #f0f0f0;
-    color: #333;
-    cursor: pointer;
+.chore-buttons .primary-btn {
+    padding: 10px;
+    font-size: 16px;
+    font-weight: bold;
+    width: 100%;
+    height: 50px;
 }
+
 
 
 
 /* Make "Done" button pop */
 .primary-btn {
-    background-color: #4CAF50; /* Green */
+    background: linear-gradient(135deg, #4CAF50, #43A047); /* richer green gradient */
     color: white;
-    border: 1px solid #4CAF50;
+    font-weight: bold;
+    border: none;
+    border-radius: 8px;
+    padding: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* subtle shadow */
+    transition: background 0.3s, transform 0.2s, box-shadow 0.2s;
 }
 
 .primary-btn:hover {
-    background-color: #45a049;
+    background: linear-gradient(135deg, #45A049, #388E3C);
+    transform: translateY(-2px); /* little lift */
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.25);
 }
+
+.primary-btn:active {
+    transform: translateY(1px); /* slight press down effect */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
 
 /* Make "Delete" button slightly red */
 .delete-btn {
@@ -204,4 +212,31 @@ input, select, button {
     font-size: 13px;
     color: #666;
     margin-bottom: 4px;
+}
+
+/* And ensure normal primary buttons have transition too */
+.primary-btn {
+    transition: transform 0.1s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.undo-btn {
+    background: linear-gradient(135deg, #f44336, #e53935); /* beautiful red gradient */
+    color: white;
+    font-weight: bold;
+    border: none;
+    border-radius: 8px;
+    padding: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transition: background 0.3s, transform 0.2s, box-shadow 0.2s;
+}
+
+.undo-btn:hover {
+    background: linear-gradient(135deg, #e53935, #d32f2f);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.25);
+}
+
+.undo-btn:active {
+    transform: translateY(1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
