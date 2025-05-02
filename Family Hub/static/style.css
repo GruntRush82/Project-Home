@@ -3,7 +3,7 @@ body {
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 20px;
-    background-color: #f7f7f7;
+    background-color: #f0f2f5;
 }
 
 .container {
@@ -31,24 +31,60 @@ input, select, button {
 
 /* One full grid per user */
 .user-section {
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    background-color: #fff;
-    padding: 10px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 10px 20px 20px 20px; /* <-- Top padding smaller */
+    margin-top: 0;                /* <-- Remove any extra top margin */
+    margin-bottom: 30px;
+    box-shadow: 0 6px 14px rgba(0,0,0,0.1);
+    border: none;
 }
+
+
 
 /* Header with username and delete */
 .user-header {
     display: flex;
-    justify-content: space-between;
+    justify-content: space-between; /* <-- Space out username and delete button */
     align-items: center;
     margin-bottom: 10px;
+    padding: 5px 10px 0 10px; /* smaller padding */
 }
 
 .user-name {
-    font-size: 18px;
-    font-weight: bold;
+    font-size: 52px;
+    font-weight: 700;
+    text-align: left;
+    color: #333; /* Clean dark grey text */
+    position: relative;
+    animation: namePulse 6s infinite ease-in-out;
+    padding: 10px 0;
+}
+
+@keyframes namePulse {
+    0%, 100% {
+        text-shadow: 0 0 6px rgba(100, 100, 255, 0.3);
+    }
+    50% {
+        text-shadow: 0 0 12px rgba(100, 100, 255, 0.5);
+    }
+}
+
+
+.delete-user {
+    padding: 6px 12px;
+    font-size: 12px;
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-left: 10px; /* little space from the username */
+}
+
+
+.delete-user:hover {
+    background-color: #f5c6cb;
 }
 
 /* Days of the week header row */
@@ -77,13 +113,6 @@ input, select, button {
     padding: 4px;
 }
 
-/* Chore card styling */
-.chore-item {
-    width: 100%;
-    box-sizing: border-box;
-    padding: 8px;
-}
-
 
 .chore-title {
     font-weight: bold;
@@ -107,18 +136,6 @@ input, select, button {
     position: relative; /* Helps manage flexbox layout safely */
 }
 
-/* Default chore card (incomplete) */
-.chore-item {
-    background-color: #f9f9f9; /* light grey */
-    padding: 10px;
-    margin-bottom: 8px;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    font-size: 14px;
-    width: 100%;
-    box-sizing: border-box;
-    transition: background-color 0.3s ease; /* smooth color transition */
-}
 
 /* Completed chore card */
 .chore-item.completed {
@@ -150,28 +167,30 @@ input, select, button {
     height: 30px;
 }
 
-.chore-buttons .primary-btn {
-    padding: 10px;
-    font-size: 16px;
-    font-weight: bold;
-    width: 100%;
-    height: 50px;
-}
-
-
-
-
-/* Make "Done" button pop */
+/* Keep this as-is — defines base style */
 .primary-btn {
-    background: linear-gradient(135deg, #4CAF50, #43A047); /* richer green gradient */
+    background: linear-gradient(135deg, #4CAF50, #43A047);
     color: white;
     font-weight: bold;
     border: none;
     border-radius: 8px;
     padding: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* subtle shadow */
+    width: 100%;
+    height: 50px;
+    font-size: 16px !important;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     transition: background 0.3s, transform 0.2s, box-shadow 0.2s;
 }
+
+/* Overrides background only */
+.primary-btn.undo-btn {
+    background: linear-gradient(135deg, #f88379, #f06565);
+}
+
+.primary-btn.undo-btn:hover {
+    background: linear-gradient(135deg, #f06565, #ec5d5d);
+}
+
 
 .primary-btn:hover {
     background: linear-gradient(135deg, #45A049, #388E3C);
@@ -214,29 +233,39 @@ input, select, button {
     margin-bottom: 4px;
 }
 
-/* And ensure normal primary buttons have transition too */
-.primary-btn {
-    transition: transform 0.1s ease, background-color 0.2s ease, box-shadow 0.2s ease;
-}
 
-.undo-btn {
-    background: linear-gradient(135deg, #f44336, #e53935); /* beautiful red gradient */
-    color: white;
-    font-weight: bold;
-    border: none;
-    border-radius: 8px;
+
+/* Chore card styling */
+.chore-item {
+    width: 100%;
+    box-sizing: border-box;
     padding: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    transition: background 0.3s, transform 0.2s, box-shadow 0.2s;
+    margin-bottom: 8px;
+    background-color: #f9f9f9; /* light grey */
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+    transition: background-color 0.4s ease, transform 0.2s ease;
 }
 
-.undo-btn:hover {
-    background: linear-gradient(135deg, #e53935, #d32f2f);
-    transform: translateY(-2px);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.25);
+@keyframes popBig {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
 }
 
-.undo-btn:active {
-    transform: translateY(1px);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+@keyframes popSmall {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.02); }
+    100% { transform: scale(1); }
 }
+
+.pop-big {
+    animation: popBig 0.2s ease;
+}
+
+.pop-small {
+    animation: popSmall 0.2s ease;
+}
+
+

@@ -95,7 +95,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
             const header = document.createElement("div");
             header.className = "user-header";
-            header.innerHTML = `<span class="user-name">${user.name}</span><button class="delete-user" data-user-id="${user.id}">Delete User</button>`;
+            header.innerHTML = `
+                <div class="user-name">${user.name}</div>
+                <button class="delete-user" data-user-id="${user.id}">Delete User</button>
+            `;
+            
 
             const daysHeader = document.createElement("div");
             daysHeader.className = "days-header";
@@ -170,30 +174,40 @@ function toggleCompleted(id) {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ completed: !chore.completed })
-            }).then(res => res.json())
-              .then(updatedChore => {
+            }).then(() => {
                 const card = document.querySelector(`[data-id='${id}']`);
                 if (card) {
                     const statusElement = card.querySelector(".chore-status");
-                    const buttonElement = card.querySelector(".primary-btn");
+                    const buttonElement = card.querySelector(".primary-btn, .undo-btn");
 
-                    if (updatedChore.completed) {
+                    if (!chore.completed) {
+                        // Mark as completed
                         card.classList.add("completed");
+                        card.classList.add("pop-big");
                         statusElement.innerText = "Status: Completed";
                         if (buttonElement) {
                             buttonElement.innerText = "Undo";
                             buttonElement.classList.add("undo-btn");
                         }
                     } else {
+                        // Mark as incomplete
                         card.classList.remove("completed");
+                        card.classList.add("pop-small");
                         statusElement.innerText = "Status: Incomplete";
                         if (buttonElement) {
                             buttonElement.innerText = "Done!";
                             buttonElement.classList.remove("undo-btn");
                         }
                     }
+                    
+
+                    // Remove the pop class after a short animation delay
+                    setTimeout(() => {
+                        card.classList.remove("pop-big", "pop-small");
+                    }, 200);
                 }
             });
         });
 }
+
 
