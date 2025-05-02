@@ -268,4 +268,38 @@ input, select, button {
     animation: popSmall 0.2s ease;
 }
 
+.rotation-user {
+    background-color: #e0f7fa;
+    padding: 12px 20px;
+    margin: 6px 0;
+    border-radius: 999px;
+    border: 1px solid #b2ebf2;
+    cursor: grab;
+    user-select: none;
+    transition: background-color 0.2s ease, transform 0.2s ease;
+    display: inline-block;
+    font-size: 18px;
+    -webkit-user-drag: none;
+    touch-action: manipulation;
+}
+
+.rotation-user:hover {
+    background-color: #b2ebf2;
+    transform: scale(1.02);
+}
+
+.rotation-user.pinned {
+    background-color: #fff3cd;
+    border: 1px solid #ffeeba;
+    font-weight: bold;
+    cursor: default;
+}
+
+.cursor-grab {
+    cursor: grab;
+}
+.cursor-grabbing {
+    cursor: grabbing;
+}
+
 

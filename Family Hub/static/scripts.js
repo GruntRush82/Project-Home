@@ -55,6 +55,119 @@ document.addEventListener("DOMContentLoaded", function () {
         })
         .then(() => loadChores());
     });
+    // Rotation select behavior
+    console.log("ATTACHING ROTATION SELECT EVENT LISTENER");
+    document.getElementById("rotation-select").addEventListener("change", function () {
+        console.log("Rotation type changed:", this.value);
+
+        const rotationType = this.value;
+        const userSelect = document.getElementById("user-select");
+        const pinnedUserDiv = document.getElementById("rotation-pinned-user");
+        const rotationListContainer = document.getElementById("rotation-list-container");
+
+        let starterUser = userSelect.value;
+        console.log("User ID selected:", starterUser);
+
+
+        if (rotationType === "rotating") {
+
+            // If no user is selected, auto-select the first valid one
+            if (!starterUser) {
+                const firstValidOption = [...userSelect.options].find(opt => opt.value && !opt.disabled);
+                if (firstValidOption) {
+                    starterUser = firstValidOption.textContent;
+                    userSelect.value = firstValidOption.value; // update visible dropdown
+                }
+            } else {
+                // Convert ID back to name (from dropdown)
+                const selectedOption = userSelect.querySelector(`option[value="${starterUser}"]`);
+                starterUser = selectedOption?.textContent || starterUser;
+            }
+
+            if (starterUser) {
+                pinnedUserDiv.textContent = `${starterUser} (Starter)`;
+                pinnedUserDiv.dataset.name = starterUser;
+                rotationListContainer.style.display = "block";
+                document.getElementById("rotation-setup").style.display = "block";
+                console.log("Pinned user display set to:", pinnedUserDiv.textContent);
+            }
+             else {
+                pinnedUserDiv.textContent = "";
+                pinnedUserDiv.removeAttribute("data-name");
+                rotationListContainer.style.display = "none";
+                document.getElementById("rotation-setup").style.display = "none";
+            }
+
+
+        } else {
+            // Reset everything if not rotating
+            pinnedUserDiv.textContent = "";
+            pinnedUserDiv.removeAttribute("data-name");
+            document.getElementById("rotation-list").innerHTML = "";
+            rotationListContainer.style.display = "none";
+        }
+
+
+    });
+
+    document.getElementById("user-select").addEventListener("change", function () {
+        const rotationType = document.getElementById("rotation-select").value;
+        if (rotationType !== "rotating") return;
+    
+        const userSelect = this;
+        const pinnedUserDiv = document.getElementById("rotation-pinned-user");
+        const selectedOption = userSelect.options[userSelect.selectedIndex];
+        const starterUser = selectedOption?.textContent;
+    
+        if (starterUser) {
+            // Remove starterUser from rotation-list if already there
+            const rotationList = document.getElementById("rotation-list");
+            const existing = [...rotationList.querySelectorAll(".rotation-user")];
+            existing.forEach(el => {
+                if (el.dataset.name === starterUser) {
+                    rotationList.removeChild(el);
+                }
+            });
+    
+            // Update pinned display
+            pinnedUserDiv.textContent = `${starterUser} (Starter)`;
+            pinnedUserDiv.dataset.name = starterUser;
+        }
+    });
+    
+
+    // Enable drag sorting of rotation list (excluding pinned user)
+    Sortable.create(document.getElementById("rotation-list"), {
+        animation: 150,
+        forceFallback: true,          // Enables fallback drag mode (better for touch)
+        fallbackClass: "dragging",   // Optional: class applied while dragging
+        fallbackOnBody: true,        // Optional: attach drag element to body
+        scroll: true                 // Optional: enables scrolling while dragging
+    });
+
+    // Add user to rotation list
+    document.getElementById("add-user-btn").addEventListener("click", function () {
+        const select = document.getElementById("rotation-user-select");
+        const value = select.value;
+        if (!value) return;
+
+        // Avoid duplicates
+        const pinnedUser = document.getElementById("rotation-pinned-user")?.dataset.name;
+        const existing = [...document.querySelectorAll("#rotation-list .rotation-user")];
+        
+        // If user is already pinned or already in the rotation list, don't add
+        if (pinnedUser === value || existing.some(el => el.dataset.name === value)) return;
+        
+
+        const div = document.createElement("div");
+        div.className = "rotation-user";
+        div.textContent = value;
+        div.dataset.name = value;
+        document.getElementById("rotation-list").appendChild(div);
+
+        select.value = ""; // reset dropdown
+    });
+
 
     // Fetch all chores and render them grouped by user
     function loadChores() {

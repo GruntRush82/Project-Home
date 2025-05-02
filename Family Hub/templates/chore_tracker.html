@@ -50,6 +50,28 @@
             </form>
         </section>
 
+    <div id="rotation-setup" class="rotation-ui" style="display: none;">
+        
+        <h3>Assign Rotating Chore</h3>
+      
+        <label for="user-select">Add additional users to rotation:</label>
+        <select id="rotation-user-select">
+          <option value="" disabled selected>Select user</option>
+          <option value="Travis">Travis</option>
+          <option value="Calvin">Calvin</option>
+          <option value="Lilah">Lilah</option>
+          <option value="Carly">Carly</option>
+        </select>
+        <button id="add-user-btn">Add</button>
+      
+        <div id="rotation-list-container" style="display: none;">
+            <div id="rotation-pinned-user" class="rotation-user pinned"></div>
+            <div id="rotation-list"></div>
+          </div>
+          
+      </div>
+
+
         <!-- Chore Grid Container -->
         <section>
             <h2>Weekly Chore Grid</h2>
@@ -60,5 +82,7 @@
     </div>
 
     <script src="{{ url_for('static', filename='scripts.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+
 </body>
 </html>
