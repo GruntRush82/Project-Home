@@ -1,4 +1,4 @@
-from flask import Flask, render_template, jsonify, request
+from flask import Flask, render_template, jsonify, request, json
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import ForeignKeyConstraint
@@ -28,6 +28,7 @@ class Chore(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     day = db.Column(db.String(100), nullable=False, default = 'Monday')
     rotation_type = db.Column(db.String(10), nullable=False, default = "static")
+    rotation_order = db.Column(db.Text, nullable=True)
 
 class ChoreHistory(db.Model):
     id = db.Column(db.Integer, primary_key = True)
@@ -85,7 +86,8 @@ def get_chores():
             "user_id": chore.user_id,
             "username": chore.user.username,  # Add the username from the user relationship
             "day" : chore.day,
-            "rotation_type" : chore.rotation_type
+            "rotation_type" : chore.rotation_type,
+            "rotation_order" : json.loads(chore.rotation_order) if chore.rotation_order else []
         }
         for chore in chores
     ]
@@ -109,6 +111,7 @@ def add_chore():
     user_id = data.get('user_id')
     day = data.get('day') # Expecting a day of the week
     rotation_type = data.get('rotation_type','static')
+    rotation_order = data.get('rotation_order', [])
 
     VALID_DAYS = {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"}
 
@@ -117,6 +120,9 @@ def add_chore():
     
     if not day in VALID_DAYS:
         return jsonify({"error": "Invalid day(s) provided"}), 400
+    
+    if rotation_order and not isinstance(rotation_order, list):
+        return jsonify({"error": "rotation_order must be a list"}), 400
 
 
 
@@ -124,7 +130,8 @@ def add_chore():
         description=description, 
         user_id=user_id,
         day=day,
-        rotation_type=rotation_type.lower()
+        rotation_type=rotation_type.lower(),
+        rotation_order=json.dumps(rotation_order) if rotation_order else None
         )
     db.session.add(new_chore)
     db.session.commit()
@@ -137,7 +144,8 @@ def add_chore():
         "user_id": new_chore.user_id,
         "username": new_chore.user.username,  # Add username here
         "day" : day,
-        "rotation_type" : new_chore.rotation_type
+        "rotation_type" : new_chore.rotation_type,
+        "rotation_order" : rotation_order
     }
 
     print(response)  # Log the response to check if the username is correct

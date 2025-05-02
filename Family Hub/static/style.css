@@ -302,4 +302,21 @@ input, select, button {
     cursor: grabbing;
 }
 
+/* Yellow background for rotating chore cards */
+.chore-item.rotating {
+    background-color: #fff9c4;
+}
+
+/* Vertical rotation list in top-right corner */
+.chore-item .rotation-indicator {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    font-size: 10px;
+    color: #444;
+    line-height: 1.2;
+    text-align: right;
+}
+
+
 
