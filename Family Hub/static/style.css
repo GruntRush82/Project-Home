@@ -137,13 +137,6 @@ input, select, button {
 }
 
 
-/* Completed chore card */
-.chore-item.completed {
-    background-color: #d4edda; /* light green background */
-    border-color: #c3e6cb;
-}
-
-
 
 .chore-buttons {
     display: flex;
@@ -246,6 +239,7 @@ input, select, button {
     border-radius: 6px;
     font-size: 14px;
     transition: background-color 0.4s ease, transform 0.2s ease;
+    overflow: visible; /* Allow internal content to render */
 }
 
 @keyframes popBig {
@@ -302,21 +296,33 @@ input, select, button {
     cursor: grabbing;
 }
 
-/* Yellow background for rotating chore cards */
+/* Highlight rotating chores */
 .chore-item.rotating {
-    background-color: #fff9c4;
-}
-
-/* Vertical rotation list in top-right corner */
-.chore-item .rotation-indicator {
-    position: absolute;
-    top: 6px;
-    right: 6px;
-    font-size: 10px;
-    color: #444;
-    line-height: 1.2;
-    text-align: right;
+    background-color: #fff9c4; /* soft yellow */
+    border: 1px solid #fbc02d;
 }
 
 
+.rotation-display div {
+    margin-bottom: 2px;
+}
 
+.rotation-display {
+    background-color: #fff3cd;
+    border: 1px solid #ffeeba;
+    border-radius: 6px;
+    padding: 8px;
+    margin-top: 6px;
+    font-size: 13px;
+    color: #856404;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    white-space: normal; /* Allow line wrapping */
+    max-width: 100%;     /* Stay within container */
+}
+
+/* Completed chore card */
+.chore-item.completed {
+    background-color: #d4edda; /* light green background */
+    border-color: #c3e6cb;
+}
