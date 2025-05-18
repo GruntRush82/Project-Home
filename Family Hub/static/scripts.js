@@ -308,7 +308,13 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     loadChores();
+    document.getElementById('reset-week-btn').addEventListener('click', () => {
+        fetch('/chores/reset', { method: 'POST' })
+        .then(res => res.ok && loadChores());   // redraw with rotated assignments
+    });
 });
+
+
 
 function deleteChore(id) {
     fetch(`/chores/${id}`, { method: 'DELETE' })

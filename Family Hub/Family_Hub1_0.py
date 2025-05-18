@@ -279,6 +279,36 @@ def not_found(error):
 def bad_request(error):
     return jsonify({"error": "Bad request"}), 400
 
+@app.route('/chores/reset', methods=['POST'])
+def manual_weekly_reset():
+    """Archive the current chores and rotate any rotating chores."""
+    # 1. Run the same logic as the scheduled task
+    weekly_archive_task()          # already commits and clears completion flags
+
+    # 2. Advance rotating chores to the next person
+    rotating_chores = Chore.query.filter_by(rotation_type='rotating').all()
+    for chore in rotating_chores:
+        order = chore.rotation_order or []
+        if not order:
+            continue  # nothing to rotate
+
+        try:
+            current_name = chore.user.username
+            next_index = (order.index(current_name) + 1) % len(order)
+            next_name   = order[next_index]
+        except ValueError:
+            # current user not in the stored order → leave as-is
+            continue
+
+        # look up the next user’s ID and transfer the chore
+        next_user = User.query.filter_by(username=next_name).first()
+        if next_user:
+            chore.user_id = next_user.id
+
+    db.session.commit()
+    return jsonify({"message": "Week archived, chores reset, rotations advanced"}), 200
+
+
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
