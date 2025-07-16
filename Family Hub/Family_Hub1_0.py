@@ -283,6 +283,9 @@ def bad_request(error):
 def manual_weekly_reset():
     """Archive the current chores and rotate any rotating chores."""
     # 1. Run the same logic as the scheduled task
+    # allow another full reset even if one already ran today
+    ChoreHistory.query.filter_by(date=date.today()).delete()
+    db.session.commit()
     weekly_archive_task()          # already commits and clears completion flags
 
     # 2. Advance rotating chores to the next person

@@ -1,5 +1,6 @@
 document.addEventListener("DOMContentLoaded", function () {
     const choreList = document.getElementById("chore-list");
+    const confettiDone = new Set();
     /* ---------- user‑filter bar ---------- */
     let currentFilter = "all";                 // "all" or a user‑id string
 
@@ -237,6 +238,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     rotation_order: c.rotation_order,
                     type: typeof c.rotation_order
                 })));
+
                 
                 renderUserChores(usersWithChores);
                 renderFilterBar(usersWithChores);
@@ -404,7 +406,18 @@ function toggleCompleted(id) {
                     setTimeout(() => {
                         card.classList.remove("pop-big", "pop-small");
                     }, 200);
+                    const userSection   = card.closest(".user-section");
+                    const stillIncomplete =
+                        userSection.querySelectorAll(".chore-item:not(.completed)").length;
+
+                    if (stillIncomplete === 0) {
+                        confetti({ spread: 70, particleCount: 120, origin: { y: 0.3 } });
+                        document.getElementById('cheer-sound').play();
+                    }
+
+
                 }
+                loadChores();
             });
         });
 }
