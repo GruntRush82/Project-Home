@@ -1,6 +1,6 @@
 /* Base Page Styling */
 body {
-    font-family: 'Poppins', Arial, sans-serif;  /* Changed to more modern font */
+    font-family: 'Poppins', Arial, sans-serif;
     margin: 0;
     padding: 20px;
     background-color: #f0f2f5;
@@ -104,11 +104,6 @@ h1 {
     width: 250px;
 }
 
-/* Forms */
-form {
-    margin-bottom: 20px;
-}
-
 /* Section headers styling */
 section {
     margin-bottom: 30px;
@@ -140,6 +135,11 @@ section h2::after {
     border-radius: 3px;
 }
 
+/* Forms */
+form {
+    margin-bottom: 20px;
+}
+
 input, select, button {
     padding: 8px 12px;
     margin: 5px;
@@ -166,8 +166,8 @@ input:focus, select:focus {
 .user-section {
     background: #ffffff;
     border-radius: 12px;
-    padding: 10px 20px 20px 20px; /* <-- Top padding smaller */
-    margin-top: 0;                /* <-- Remove any extra top margin */
+    padding: 10px 20px 20px 20px;
+    margin-top: 0;
     margin-bottom: 30px;
     box-shadow: 0 6px 14px rgba(0,0,0,0.1);
     border: none;
@@ -176,17 +176,17 @@ input:focus, select:focus {
 /* Header with username and delete */
 .user-header {
     display: flex;
-    justify-content: space-between; /* <-- Space out username and delete button */
+    justify-content: space-between;
     align-items: center;
     margin-bottom: 10px;
-    padding: 5px 10px 0 10px; /* smaller padding */
+    padding: 5px 10px 0 10px;
 }
 
 .user-name {
     font-size: 52px;
     font-weight: 700;
     text-align: left;
-    color: #333; /* Clean dark grey text */
+    color: #333;
     position: relative;
     animation: namePulse 6s infinite ease-in-out;
     padding: 10px 0;
@@ -209,7 +209,7 @@ input:focus, select:focus {
     border: 1px solid #f5c6cb;
     border-radius: 4px;
     cursor: pointer;
-    margin-left: 10px; /* little space from the username */
+    margin-left: 10px;
 }
 
 .delete-user:hover {
@@ -239,15 +239,22 @@ input:focus, select:focus {
     min-height: 80px;
     border-left: 1px solid #eee;
     padding: 4px;
+    overflow-x: hidden;
+    position: relative;
 }
 
 .chore-title {
     font-weight: bold;
+    font-size: 16px;
+    margin-bottom: 6px;
+    color: #333;
 }
 
 .chore-status, .chore-rotation {
     font-size: 13px;
     margin: 2px 0;
+    color: #666;
+    margin-bottom: 4px;
 }
 
 .chore-item button {
@@ -256,17 +263,9 @@ input:focus, select:focus {
     margin-top: 5px;
 }
 
-.day-col {
-    min-height: 80px;
-    border-left: 1px solid #eee;
-    padding: 4px;
-    overflow-x: hidden; /* Prevents chore-item from overflowing horizontally */
-    position: relative; /* Helps manage flexbox layout safely */
-}
-
 .chore-buttons {
     display: flex;
-    flex-direction: column; /* change from row to column */
+    flex-direction: column;
     gap: 4px;
     margin-top: 8px;
 }
@@ -310,12 +309,12 @@ input:focus, select:focus {
 
 .primary-btn:hover {
     background: linear-gradient(135deg, #45A049, #388E3C);
-    transform: translateY(-2px); /* little lift */
+    transform: translateY(-2px);
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.25);
 }
 
 .primary-btn:active {
-    transform: translateY(1px); /* slight press down effect */
+    transform: translateY(1px);
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
@@ -335,31 +334,18 @@ input:focus, select:focus {
     background-color: #e0e0e0;
 }
 
-.chore-title {
-    font-size: 16px;
-    font-weight: bold;
-    margin-bottom: 6px;
-    color: #333;
-}
-
-.chore-status, .chore-rotation {
-    font-size: 13px;
-    color: #666;
-    margin-bottom: 4px;
-}
-
 /* Chore card styling */
 .chore-item {
     width: 100%;
     box-sizing: border-box;
     padding: 10px;
     margin-bottom: 8px;
-    background-color: #f9f9f9; /* light grey */
+    background-color: #f9f9f9;
     border: 1px solid #ddd;
     border-radius: 6px;
     font-size: 14px;
     transition: background-color 0.4s ease, transform 0.2s ease;
-    overflow: visible; /* Allow internal content to render */
+    overflow: visible;
 }
 
 @keyframes popBig {
@@ -419,7 +405,7 @@ input:focus, select:focus {
 
 /* Highlight rotating chores */
 .chore-item.rotating {
-    background-color: #fff9c4; /* soft yellow */
+    background-color: #fff9c4;
     border: 1px solid #fbc02d;
 }
 
@@ -437,22 +423,22 @@ input:focus, select:focus {
     color: #856404;
     word-wrap: break-word;
     overflow-wrap: break-word;
-    white-space: normal; /* Allow line wrapping */
-    max-width: 100%;     /* Stay within container */
+    white-space: normal;
+    max-width: 100%;
 }
 
 /* Completed chore card */
 .chore-item.completed {
-    background-color: #d4edda; /* light green background */
+    background-color: #d4edda;
     border-color: #c3e6cb;
 }
 
 #reset-week-btn {
-    background: #607D8B;              /* muted blue-grey */
+    background: #607D8B;
     color: #fff;
-    padding: 6px 16px;               /* smaller */
+    padding: 6px 16px;
     font-size: 14px !important;
-    width: auto;                     /* let content size it */
+    width: auto;
     height: auto;
     border: none;
     border-radius: 6px;
@@ -461,34 +447,4 @@ input:focus, select:focus {
 
 #reset-week-btn:hover {
     background: #546E7A;
-}
-
-/* --- user‑filter bar --- */
-.filter-bar {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 12px;
-    justify-content: center;
-    margin: 10px 0 25px;
-}
-
-.filter-btn {
-    background: linear-gradient(135deg, #3498db, #9b59b6);
-    color: #fff;
-    font-weight: 600;
-    border: none;
-    border-radius: 20px;
-    padding: 8px 18px;
-    cursor: pointer;
-    box-shadow: 0 3px 6px rgba(0,0,0,0.15);
-    transition: transform 0.15s, box-shadow 0.15s;
-}
-
-.filter-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 5px 10px rgba(0,0,0,0.2);
-}
-
-.filter-btn.active {
-    background: linear-gradient(135deg, #2ecc71, #27ae60); /* highlight */
-}
+} 

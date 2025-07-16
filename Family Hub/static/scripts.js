@@ -1,5 +1,36 @@
 document.addEventListener("DOMContentLoaded", function () {
     const choreList = document.getElementById("chore-list");
+    /* ---------- user‑filter bar ---------- */
+    let currentFilter = "all";                 // "all" or a user‑id string
+
+    function renderFilterBar(users) {
+        // create (or reuse) the bar
+        let bar = document.getElementById("user-filter-bar");
+        if (!bar) {
+            bar = document.createElement("div");
+            bar.id = "user-filter-bar";
+            bar.className = "filter-bar";
+
+            choreList.parentNode.insertBefore(bar, choreList);
+
+        }
+        bar.innerHTML = "";                    // clear & rebuild
+
+        const addBtn = (label, value) => {
+            const btn = document.createElement("button");
+            btn.textContent = label;
+            btn.className = "filter-btn" + (currentFilter === value ? " active" : "");
+            btn.onclick = () => {
+                currentFilter = value;
+                renderFilterBar(users);        // refresh highlight
+                renderUserChores(users);       // redraw grid
+            };
+            bar.appendChild(btn);
+        };
+
+        addBtn("All", "all");
+        users.forEach(u => addBtn(u.name, String(u.id)));
+    }
 
     // Populate the user dropdown
     fetch("/users")
@@ -208,6 +239,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 })));
                 
                 renderUserChores(usersWithChores);
+                renderFilterBar(usersWithChores);
             });
     }
 
@@ -224,6 +256,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
 
         users.forEach(user => {
+            if (currentFilter !== "all" && currentFilter !== String(user.id)) return;
             const section = document.createElement("div");
             section.className = "user-section";
 
