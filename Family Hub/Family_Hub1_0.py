@@ -5,7 +5,13 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import ForeignKeyConstraint
 from datetime import date
 from flask_apscheduler import APScheduler
+from reporting import sync_config
+from reporting import generate_weekly_reports
+from datetime import datetime, timedelta
 import sys
+
+from dotenv import load_dotenv
+load_dotenv()    
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///chores.db'
@@ -45,30 +51,54 @@ class ChoreHistory(db.Model):
 
 
 @scheduler.task('cron', id='weekly_archive',day_of_week='mon', hour=0, minute=0, misfire_grace_time=60, coalesce = True, max_instances= 1)
-def weekly_archive_task():
+
+def weekly_archive_task(*, send_reports: bool = True):
     with app.app_context():
         today = date.today()
         if ChoreHistory.query.filter_by(date=today).first():
-            print(f"Daily archive for {today} already exists. Skipping Archive process")
+            print(f"Archive for {today} already exists; skipping.")
             return
-        
-        chores = Chore.query.all()
-        for chore in chores:
-            # Add a record to ChoreHistory
-            chore_history = ChoreHistory(
-                chore_id=chore.id,
-                username=chore.user.username,
-                date=today,
-                completed=chore.completed,
-                day=chore.day,
-                rotation_type=chore.rotation_type
+
+        # 1. archive + reset status
+        for chore in Chore.query.all():
+            db.session.add(
+                ChoreHistory(
+                    chore_id=chore.id,
+                    username=chore.user.username,
+                    date=today,
+                    completed=chore.completed,
+                    day=chore.day,
+                    rotation_type=chore.rotation_type,
+                )
             )
-            db.session.add(chore_history)
-            # Reset the chore's status to incomplete
             chore.completed = False
 
+        # 2. advance rotating chores
+        rotate_chores_once()
+
         db.session.commit()
-        print(f"Daily archive process completed! - {today}")
+
+        if send_reports:
+            generate_weekly_reports(db.session)
+
+        print(f"Archive+rotation complete – {today}")
+
+
+def rotate_chores_once():
+    rotating = Chore.query.filter_by(rotation_type="rotating").all()
+    for chore in rotating:
+        order = chore.rotation_order or []
+        if not order:
+            continue
+        try:
+            curr = chore.user.username
+            nxt = order[(order.index(curr) + 1) % len(order)]
+        except ValueError:
+            continue  # current user not in list
+        next_user = User.query.filter_by(username=nxt).first()
+        if next_user:
+            chore.user_id = next_user.id
+
 
 # Start the scheduler
 
@@ -281,40 +311,26 @@ def bad_request(error):
 
 @app.route('/chores/reset', methods=['POST'])
 def manual_weekly_reset():
-    """Archive the current chores and rotate any rotating chores."""
-    # 1. Run the same logic as the scheduled task
-    # allow another full reset even if one already ran today
+    body        = request.get_json(silent=True) or {}
+    send_flag   = bool(body.get("generate_reports"))
+
+    # --- 1️⃣ wipe out any archive rows for *today* -------------------------
     ChoreHistory.query.filter_by(date=date.today()).delete()
-    db.session.commit()
-    weekly_archive_task()          # already commits and clears completion flags
+    db.session.commit()            # make sure they’re really gone
 
-    # 2. Advance rotating chores to the next person
-    rotating_chores = Chore.query.filter_by(rotation_type='rotating').all()
-    for chore in rotating_chores:
-        order = chore.rotation_order or []
-        if not order:
-            continue  # nothing to rotate
+    # --- 2️⃣ run the same weekly task (it will now proceed) ---------------
+    weekly_archive_task(send_reports=send_flag)
 
-        try:
-            current_name = chore.user.username
-            next_index = (order.index(current_name) + 1) % len(order)
-            next_name   = order[next_index]
-        except ValueError:
-            # current user not in the stored order → leave as-is
-            continue
-
-        # look up the next user’s ID and transfer the chore
-        next_user = User.query.filter_by(username=next_name).first()
-        if next_user:
-            chore.user_id = next_user.id
-
-    db.session.commit()
-    return jsonify({"message": "Week archived, chores reset, rotations advanced"}), 200
-
+    return jsonify({
+        "message": "Week archived & rotated",
+        "reports_sent": send_flag,
+        "date": str(date.today())
+    }), 200
 
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
+        sync_config(db.session)
     scheduler.init_app(app)
     scheduler.start()
     app.run(debug=True, use_reloader=False)

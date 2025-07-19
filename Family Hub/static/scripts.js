@@ -35,16 +35,25 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Populate the user dropdown
     fetch("/users")
-        .then(response => response.json())
-        .then(users => {
-            const userSelect = document.getElementById('user-select');
-            users.forEach(user => {
-                const option = document.createElement("option");
-                option.value = user.id;
-                option.textContent = user.username;
-                userSelect.appendChild(option);
-            });
+    .then(res => res.json())
+    .then(users => {
+        const mainSel  = document.getElementById("user-select");
+        const rotSel   = document.getElementById("rotation-user-select");
+
+        users.forEach(u => {
+            // main “Add Chore” dropdown
+            const opt1 = document.createElement("option");
+            opt1.value = u.id;
+            opt1.textContent = u.username;
+            mainSel.appendChild(opt1);
+
+            // rotation “extra users” dropdown (name value, not id)
+            const opt2 = document.createElement("option");
+            opt2.value = u.username;
+            opt2.textContent = u.username;
+            rotSel.appendChild(opt2);
         });
+    });
 
     // Handle creating a new user
     document.getElementById('create-user-form').addEventListener('submit', function (e) {
@@ -244,6 +253,35 @@ document.addEventListener("DOMContentLoaded", function () {
                 renderFilterBar(usersWithChores);
             });
     }
+// ---------------------------------------------------------------------------
+// Delete‑user handler (delegated)
+// ---------------------------------------------------------------------------
+    document.addEventListener("click", async (ev) => {
+        // look for a click on a .delete-user button
+        const btn = ev.target.closest(".delete-user");
+        if (!btn) return;                          // click wasn’t on that button
+
+        const userId   = btn.dataset.userId;
+        const userName = btn.closest(".user-header")
+                            ?.querySelector(".user-name")?.textContent ?? "";
+
+        if (!userId) return;
+
+        // confirmation dialog
+        const ok = confirm(`Delete ${userName || "this user"} and ALL their chores?`);
+        if (!ok) return;
+
+        try {
+            const res = await fetch(`/users/${userId}`, { method: "DELETE" });
+            if (!res.ok) throw new Error(`Server responded ${res.status}`);
+            // refresh UI
+            loadChores();
+            alert(`${userName || "User"} deleted.`);
+        } catch (err) {
+            console.error(err);
+            alert("Failed to delete user – see console for details.");
+        }
+    });
 
     function groupChoresByUser(chores) {
         return chores.reduce((acc, chore) => {
