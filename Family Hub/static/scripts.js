@@ -3,6 +3,12 @@ document.addEventListener("DOMContentLoaded", function () {
     const confettiDone = new Set();
     /* ---------- user‑filter bar ---------- */
     let currentFilter = "all";                 // "all" or a user‑id string
+    
+    let dayView = "all";  // "all" or "today"
+    const DAYS = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
+    function getTodayName() {
+        return DAYS[(new Date().getDay() + 6) % 7]; // JS Sun=0 -> index 6; Mon=1 -> 0, etc.
+    }
 
     function renderFilterBar(users) {
         // create (or reuse) the bar
@@ -15,22 +21,41 @@ document.addEventListener("DOMContentLoaded", function () {
             choreList.parentNode.insertBefore(bar, choreList);
 
         }
-        bar.innerHTML = "";                    // clear & rebuild
+        bar.innerHTML = "";
 
+        // two rows
+        const userRow = document.createElement("div");
+        userRow.className = "filter-row user-filter-row";
+        const dayRow = document.createElement("div");
+        dayRow.className = "filter-row day-filter-row";
+        bar.append(userRow, dayRow);
+
+        // use userRow for user buttons
         const addBtn = (label, value) => {
-            const btn = document.createElement("button");
-            btn.textContent = label;
-            btn.className = "filter-btn" + (currentFilter === value ? " active" : "");
-            btn.onclick = () => {
-                currentFilter = value;
-                renderFilterBar(users);        // refresh highlight
-                renderUserChores(users);       // redraw grid
-            };
-            bar.appendChild(btn);
+        const btn = document.createElement("button");
+        btn.textContent = label;
+        btn.className = "filter-btn" + (currentFilter === value ? " active" : "");
+        btn.onclick = () => { currentFilter = value; loadChores(); };
+        userRow.appendChild(btn);                // ⬅️ was: bar.appendChild(btn)
         };
 
         addBtn("All", "all");
         users.forEach(u => addBtn(u.name, String(u.id)));
+
+        // day buttons go in dayRow
+        const allDaysBtn = document.createElement("button");
+        allDaysBtn.textContent = "All Days";
+        allDaysBtn.className = "filter-btn" + (dayView === "all" ? " active" : "");
+        allDaysBtn.onclick = () => { dayView = "all"; loadChores(); };
+        dayRow.appendChild(allDaysBtn);
+
+        const todayBtn = document.createElement("button");
+        todayBtn.textContent = `Today (${getTodayName()})`;
+        todayBtn.className = "filter-btn" + (dayView === "today" ? " active" : "");
+        todayBtn.onclick = () => { dayView = "today"; loadChores(); };
+        dayRow.appendChild(todayBtn);
+
+
     }
 
     // Populate the user dropdown
@@ -293,7 +318,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function renderUserChores(users) {
         choreList.innerHTML = "";
-        const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+        const days = (dayView === "today") ? [getTodayName()] : DAYS;
+        document.body.classList.toggle("today-mode", dayView === "today");
 
         users.forEach(user => {
             if (currentFilter !== "all" && currentFilter !== String(user.id)) return;
